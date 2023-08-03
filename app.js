@@ -23,7 +23,7 @@ class Calculator {
     }
 
     deleteNumber(){
-       this.currentNumber = this.currentNumber
+       this.currentNumber =  this.currentNumber.toString().slice(0, -1);
     }
 
     chooseOperations(operation){
@@ -36,7 +36,6 @@ class Calculator {
          this.currentNumber = ''
     }
     
-
     computeNumber(){
         let result
         let currentNumberParse = parseFloat(this.currentNumber);
@@ -65,14 +64,31 @@ class Calculator {
         this.isResultDisplayed = true;
     }
 
+    getCorrectedNumber(number){
+        const stringNumber = number.toString();
+        const integerNumber = parseFloat(stringNumber.split('.')[0]);
+        const decimalNumber = stringNumber.split('.')[1];
+        let integerDisplay 
+        if(isNaN(integerNumber)){
+            integerDisplay = ''
+        } else {
+            integerDisplay = integerNumber.toLocaleString('en' , {maximumFractionDigits : 0} )
+        }
+        if(decimalNumber != null){
+            return `${integerDisplay}.${decimalNumber}`
+        } else {
+            return integerDisplay
+        }
+    }
+
     updateDisplay(){
-        this.currentNumberText.innerText = this.currentNumber;
+        this.currentNumberText.innerText = this.getCorrectedNumber(this.currentNumber);
         if(this.operation != null) {
-            this.previousNumberText.innerText  = `${this.previousNumber} ${this.operation}`
+            this.previousNumberText.innerText  = `${this.getCorrectedNumber(this.previousNumber)} ${this.operation}`
         } else {
             this.previousNumberText.innerText = ''
         }
-    }
+    } 
 }
 
 
@@ -118,4 +134,37 @@ deleteBtn.addEventListener('click' , ()=> {
 equalsBtn.addEventListener('click' , ()=> {
     calculator.computeNumber();
     calculator.updateDisplay();
+})
+
+
+//Getting Keyboard input
+const keys = {
+    '0' : () => calculator.appendNumber('0'),
+    '1' : () => calculator.appendNumber('1'),
+    '2' : () => calculator.appendNumber('2'),
+    '3' : () => calculator.appendNumber('3'),
+    '4' : () => calculator.appendNumber('4'),
+    '5' : () => calculator.appendNumber('5'),
+    '6' : () => calculator.appendNumber('6'),
+    '7' : () => calculator.appendNumber('7'),
+    '8' : () => calculator.appendNumber('8'),
+    '9' : () => calculator.appendNumber('9'),
+    '0' : () => calculator.appendNumber('0'),
+    '+' : () => calculator.chooseOperations('+'),
+    '-' : () => calculator.chooseOperations('-'),
+    '/' : () => calculator.chooseOperations('÷'),
+    '*' : () => calculator.chooseOperations('×'),
+    '.' : () => calculator.appendNumber('.'),
+    'Enter' : () => calculator.computeNumber(),
+    'Backspace' : () => calculator.deleteNumber()
+}
+
+
+document.addEventListener('keyup' , (e) => {
+    const button = keys[e.key];
+
+    if (button) {
+        button()
+        calculator.updateDisplay();
+    }
 })
